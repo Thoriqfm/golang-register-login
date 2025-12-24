@@ -29,6 +29,12 @@ func (r *Rest) MountEndPoint() {
 	// Auth endpoint
 	auth := baseURL.Group("/auth")
 	auth.POST("/register", r.RegisterUser)
+	auth.POST("/login", r.LoginUser)
+
+	// Reset password endpoint
+	auth.POST("/forgot-password", r.ForgotPassword)
+	auth.GET("/verify-reset-token", r.VerifyResetToken)
+	auth.POST("/reset-password", r.ResetPassword)
 }
 
 func (r *Rest) Run() {

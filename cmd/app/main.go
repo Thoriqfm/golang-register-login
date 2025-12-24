@@ -7,6 +7,7 @@ import (
 	"golang-register-login/pkg/bcyrpt"
 	"golang-register-login/pkg/config"
 	"golang-register-login/pkg/database/mysql"
+	"golang-register-login/pkg/email"
 	"golang-register-login/pkg/jwt"
 	"golang-register-login/pkg/middleware"
 	"log"
@@ -28,7 +29,8 @@ func main() {
 	repo := repository.NewRepository(db)
 	bcrypt := bcyrpt.Init()
 	jwtAuth := jwt.Init()
-	svc := service.NewService(repo, bcrypt, jwtAuth)
+	email := email.Init()
+	svc := service.NewService(repo, bcrypt, jwtAuth, email)
 	middleware := middleware.Init(svc, jwtAuth)
 	r := rest.NewRest(svc, middleware)
 	r.MountEndPoint()

@@ -28,3 +28,13 @@ type UserLoginResponse struct {
 	Token  string `json:"token"`
 	RoleID int    `json:"role_id"`
 }
+
+type UserForgotPasswordParam struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type UserForgotPasswordResponse struct {
+	Token              string `json:"token"`
+	NewPassword        string `json:"new_password" binding:"required"`
+	ConfirmNewPassword string `json:"confirm_new_password" binding:"required"`
+}

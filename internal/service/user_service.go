@@ -16,6 +16,7 @@ import (
 type IUserService interface {
 	GetUser(param model.UserParam) (*entity.User, error)
 	RegisterUser(param model.UserRegisterParam) (*model.UserRegisterResponse, error)
+	LoginUser(param model.UserLoginParam) (*model.UserLoginResponse, error)
 }
 
 type UserService struct {
@@ -93,6 +94,35 @@ func (u *UserService) RegisterUser(param model.UserRegisterParam) (*model.UserRe
 	response := &model.UserRegisterResponse{
 		Username: param.Username,
 		Email:    param.Email,
+	}
+
+	return response, nil
+}
+
+func (u *UserService) LoginUser(param model.UserLoginParam) (*model.UserLoginResponse, error) {
+	tx := u.db.Begin()
+	defer tx.Rollback()
+
+	user, err := u.UserRepository.GetUser(model.UserParam{
+		Email: param.Email,
+	})
+	if err != nil {
+		return nil, errors.New("email or password is incorrect")
+	}
+
+	err = u.bcyrpt.CompareHashPassword(user.Password, param.Password)
+	if err != nil {
+		return nil, errors.New("email or password is incorrect")
+	}
+
+	token, err := u.jwtAuth.CreateToken(user.UserID, false)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &model.UserLoginResponse{
+		Token:  token,
+		RoleID: user.RoleID,
 	}
 
 	return response, nil
